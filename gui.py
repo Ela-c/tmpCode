@@ -1,12 +1,25 @@
 import tkinter as tk
 import tkinter.font as tkfont
-# from gpiozero import LED
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
-# GPIO.setmode(GPIO.BCM)
 
-# hardware
-# led = LED(14)
+def setup():
+    # declare pin standard
+    GPIO.setmode(GPIO.BCM)
+    # Set pin mode for GPIO pins to OUTPUT
+    for values in availableColors.values():
+        pin = values['pin']
+        print("pin: " + str(pin))
+        GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
+
+
+def turnLedOn(pin: int):
+    GPIO.output(pin, GPIO.HIGH)
+
+
+def turnLedOff(pin: int):
+    GPIO.output(pin, GPIO.LOW)
+
 
 ## GUI DEFINITIONS ##
 mainWindow = tk.Tk()
@@ -18,19 +31,24 @@ myFont = tkfont.Font(family="Helvetica", size=12, weight="bold")
 
 def ledToggle(pin: int):
     print(f"button pressed {sharedVariable.get()}")
-    # if led.is_lit:
-    #     led.off()
-    #     v.set(0)
+    for value in availableColors.values():
+        if (value['pin'] == pin):
+            turnLedOn(pin)
+        else:
+            turnLedOff(value['pin'])
 
 
 def diselectAllBtns():
     # turn off LEDs
     sharedVariable.set("")
+    for value in availableColors.values():
+        pin = value['pin']
+        turnLedOff(pin)
 
 
 def close():
     # turn led off
-    # GPIO.cleanup()
+    GPIO.cleanup()
     print("closing program")
     # exit program
     mainWindow.destroy()
@@ -41,18 +59,18 @@ availableColors = {
         'label': 'Red',
         'hexCode': "#ff0000",
         'value': 'red',
-        'pin': 2,
+        'pin': 11,
     }, 'blue': {
         'label': 'Blue',
         'hexCode': '#3944bc',
         'value': 'blue',
-        'pin': 2,
+        'pin': 10,
     },
     'green': {
         'label': 'Green',
         'hexCode': '#3cb043',
         'value': 'green',
-        'pin': 2,
+        'pin': 9,
     },
 
 }
@@ -84,4 +102,5 @@ exitBtn = tk.Button(mainWindow, text="Exit", font=myFont,
 
 mainWindow.protocol("WM_DELETE_WINDOW", close)
 
+setup()
 mainWindow.mainloop()
